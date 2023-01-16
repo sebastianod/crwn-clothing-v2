@@ -1,6 +1,6 @@
 import './category-item.styles.scss';
 
-const CategoryItem = ({ category }) => {
+const CategoryItem = ({ categoryy: category }) => {//props are objects, destructured here
   const { imageUrl, title } = category;
   return (
     <div className='category-container'>
