@@ -1,11 +1,13 @@
 import { initializeApp } from "firebase/app"; //contains several libraries
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
+
 import { //from authentication library
   getAuth,
   signInWithRedirect,
   signInWithPopup,
   GoogleAuthProvider,
+  createUserWithEmailAndPassword
 } from "firebase/auth"; //contained in firebase/app
 
 import { //Firestore database library
@@ -47,6 +49,7 @@ export const db = getFirestore(); //initialize the database
 //get the data obtained from the authentication service and then save it in
 //the firestore database
 export const createUserDocumentFromAuth = async (userAuth) => {//user auth is what is returned from the user authentication
+  if (!userAuth) return; //if there's no user authentication, don't run this function
   //get me the document reference with said specifications:
   const userDocRef = doc(db, "users", userAuth.uid);//doc takes in 1. database 2. collection 3. data. uid is th eunique id to a user, given back in the sign-in component
 //even if the "users" collection nor the document exist, google will create a pointer to them
@@ -54,7 +57,7 @@ export const createUserDocumentFromAuth = async (userAuth) => {//user auth is wh
   console.log(userDocRef);
 
   //----get the data related to the document userDocRef, check whether it exists
-  const userSnapshot = await getDoc(userDocRef);
+  const userSnapshot = await getDoc(userDocRef);//getDoc get's the doc's data
   console.log(userSnapshot);
   console.log(userSnapshot.exists());//check if it exists in the database
 
@@ -76,4 +79,38 @@ export const createUserDocumentFromAuth = async (userAuth) => {//user auth is wh
     }
   } 
   return userDocRef; //if the user already exists, simply return it.
+}
+
+//------------Create from email and Password--------------//
+export const createAuthUserFromEmailAndPassword = async(displayName ,email,password) => { //this function needs and email and password
+  //if no email nor password is provided exit, don't call the method
+  if (!email || !password) return;
+  //if both are entered
+  const userCredential = await createUserWithEmailAndPassword(auth, email, password); //this is a google function so it's async
+  const user = userCredential.user;
+  console.log(user);
+
+  // ----Onto actually creating the user in our DB----//
+  // 1. create a reference path
+  const userDocRef = doc(db, "users", user.uid); 
+
+  //2. create user if it doesn't exist already
+  const userSnapshot = await getDoc(userDocRef);
+
+  if (!userSnapshot.exists()) { //if user doesn't exist already, create him
+    const { email } = user;
+    const createdAt = new Date();
+
+    try {
+      await setDoc(userDocRef, {//sets the data in a document (userDocRef in this case)
+        displayName,
+        email,
+        createdAt
+      }); //using the document reference...create said object
+    } catch(error) {
+      console.log("Error creating the user" + error);
+    } 
+  }
+  return userDocRef; //in case user already exists
+
 }
