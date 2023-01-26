@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { UserContext } from '../context/user.context';
 
 import FormInput from '../form-input/form-input.component';
 import Button from '../button/button.component';
@@ -18,7 +19,8 @@ const defaultFormFields = {
 
 const SignInForm = () => {
   const [formFields, setFormFields] = useState(defaultFormFields);
-  const { email, password } = formFields;
+  const { email, password } = formFields; //destructuring
+  const {setCurrentUser} = useContext(UserContext); //Use the data brought from UserContext: currentUser+setCurrentUser
 
   const resetFormFields = () => {
     setFormFields(defaultFormFields);
@@ -29,15 +31,17 @@ const SignInForm = () => {
     await createUserDocumentFromAuth(user);
   };
 
+  //-----------Sign-in with email and password----------------
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     try {
-      const response = await signInAuthUserWithEmailAndPassword(
+      const {user} = await signInAuthUserWithEmailAndPassword(
         email,
         password
       );
-      console.log(response);
+      // setCurrentUser(user); //set the current user as the one signed in
+      // console.log(user);
       resetFormFields();
     } catch (error) {
       switch (error.code) {

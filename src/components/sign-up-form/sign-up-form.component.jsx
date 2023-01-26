@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { UserContext } from '../context/user.context';
 
 import FormInput from '../form-input/form-input.component';
 import Button from '../button/button.component';
@@ -20,6 +21,7 @@ const defaultFormFields = {
 const SignUpForm = () => {
   const [formFields, setFormFields] = useState(defaultFormFields);
   const { displayName, email, password, confirmPassword } = formFields;
+  const {setCurrentUser} = useContext(UserContext);//destructuring setter function within UserContext
 
   const resetFormFields = () => {
     setFormFields(defaultFormFields);
@@ -32,12 +34,13 @@ const SignUpForm = () => {
       alert('passwords do not match');
       return;
     }
-
+//else try this, and catch the error from trying
     try {
       const { user } = await createAuthUserWithEmailAndPassword(
         email,
         password
       );
+      // setCurrentUser(user); //brought over from useContext and UserContext above.
 
       await createUserDocumentFromAuth(user, { displayName });
       resetFormFields();
