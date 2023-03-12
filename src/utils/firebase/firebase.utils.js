@@ -64,9 +64,12 @@ export const getCategoriesAndDocuments = async () => {
   const collectionRef = collection(db, 'categories');
   const q = query(collectionRef);
 
-  const querySnapshot = await getDocs(q);
+  const querySnapshot = await getDocs(q);//returns query snapshot of the categories collection
+  //-----get an object with all category items
+  //  querySnapshot.docs is an array containing each object in categories
+  // reduce takes each item in the array and returns an object, accumulated.
   const categoryMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
-    const { title, items } = docSnapshot.data();
+    const { title, items } = docSnapshot.data();//level of Hats, Jackets, Mens, etc
     acc[title.toLowerCase()] = items;
     return acc;
   }, {});

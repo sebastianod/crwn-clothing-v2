@@ -8,6 +8,7 @@ import './shop.styles.scss';
 
 const Shop = () => {
   const { categoriesMap } = useContext(CategoriesContext);
+  // console.log(categoriesMap);
 
   return (
     <Fragment>
